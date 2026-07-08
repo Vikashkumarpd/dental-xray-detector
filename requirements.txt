@@ -1,0 +1,7 @@
+torch
+torchvision
+segmentation-models-pytorch
+ultralytics
+albumentations
+opencv-python-headless
+streamlit
