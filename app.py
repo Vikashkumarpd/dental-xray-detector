@@ -20,7 +20,6 @@ FDI_CLASSES = [
 ]
 class_names = {idx: str(fdi) for idx, fdi in enumerate(FDI_CLASSES)}
 
-# Replace these with your actual Google Drive file IDs
 UNET_FILE_ID = "1OF4ipYCqqlF5Cz_ocW9Egc9E_O8sS-Fd"
 YOLO_FILE_ID = "1cCEj-Fg0w7-gWfonFITRxs4AsyNWcdWh"
 
@@ -100,4 +99,11 @@ st.write(
 
 uploaded_file = st.file_uploader("Upload Dental X-ray", type=["png", "jpg", "jpeg"])
 
-if
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
+    st.image(image, caption="Uploaded X-ray", use_column_width=True)
+
+    with st.spinner("Running prediction..."):
+        result = predict(image)
+
+    st.image(result, caption="Segmentation + Detection Result", use_column_width=True)
