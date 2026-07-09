@@ -1,7 +1,7 @@
 torch
 torchvision
 segmentation-models-pytorch
-ultralytics
+ultralytics==8.3.40
 albumentations
 opencv-python-headless
 streamlit
