@@ -7,6 +7,8 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 import streamlit as st
 from PIL import Image
+import gdown
+import os
 
 DEVICE = "cpu"
 
@@ -18,10 +20,22 @@ FDI_CLASSES = [
 ]
 class_names = {idx: str(fdi) for idx, fdi in enumerate(FDI_CLASSES)}
 
+# Replace these with your actual Google Drive file IDs
+UNET_FILE_ID = "1OF4ipYCqqlF5Cz_ocW9Egc9E_O8sS-Fd"
+YOLO_FILE_ID = "1cCEj-Fg0w7-gWfonFITRxs4AsyNWcdWh"
+
+
 @st.cache_resource
 def load_models():
+
+    if not os.path.exists("best_model.pth"):
+        gdown.download(id=UNET_FILE_ID, output="best_model.pth", quiet=False)
+
+    if not os.path.exists("best.pt"):
+        gdown.download(id=YOLO_FILE_ID, output="best.pt", quiet=False)
+
     unet_model = smp.Unet(
-        encoder_name="resnet34",
+        encoder_name="efficientnet-b0",
         encoder_weights=None,
         in_channels=3,
         classes=1
@@ -32,6 +46,7 @@ def load_models():
     yolo_model = YOLO("best.pt")
 
     return unet_model, yolo_model
+
 
 unet_model, yolo_model = load_models()
 
@@ -75,6 +90,7 @@ def predict(image):
 
 
 st.title("Dental X-ray Tooth Segmentation & Detection")
+st.caption("Model: EfficientNet-B0 (U-Net) + YOLOv8n")
 st.write(
     "Upload a panoramic dental X-ray to see U-Net segmentation and YOLO tooth "
     "detection with FDI numbers.\n\n"
@@ -84,11 +100,4 @@ st.write(
 
 uploaded_file = st.file_uploader("Upload Dental X-ray", type=["png", "jpg", "jpeg"])
 
-if uploaded_file is not None:
-    image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded X-ray", use_column_width=True)
-
-    with st.spinner("Running prediction..."):
-        result = predict(image)
-
-    st.image(result, caption="Segmentation + Detection Result", use_column_width=True)
+if
