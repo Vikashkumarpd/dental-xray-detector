@@ -1,8 +1,8 @@
 torch
 torchvision
 segmentation-models-pytorch
-ultralytics==8.3.40
+ultralytics
 albumentations
 opencv-python-headless
 streamlit
-gdown
+huggingface_hub
