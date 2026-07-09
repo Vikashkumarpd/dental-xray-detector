@@ -7,8 +7,8 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 import streamlit as st
 from PIL import Image
-import gdown
 import os
+from huggingface_hub import hf_hub_download
 
 DEVICE = "cpu"
 
@@ -20,31 +20,13 @@ FDI_CLASSES = [
 ]
 class_names = {idx: str(fdi) for idx, fdi in enumerate(FDI_CLASSES)}
 
-UNET_FILE_ID = "1OF4ipYCqqlF5Cz_ocW9Egc9E_O8sS-Fd"
-YOLO_FILE_ID = "1cCEj-Fg0w7-gWfonFITRxs4AsyNWcdWh"
+HF_REPO_ID = "avkpkumar/dental-xray-models"   # apna username/repo-name daalo
 
 
 @st.cache_resource
 def load_models():
-
-    if not os.path.exists("best_model.pth"):
-        gdown.download(id=UNET_FILE_ID, output="best_model.pth", quiet=False)
-
-    if not os.path.exists("best.pt"):
-        gdown.download(id=YOLO_FILE_ID, output="best.pt", quiet=False)
-
-    if os.path.getsize("best.pt") < 100_000:
-        os.remove("best.pt")
-        raise RuntimeError(
-            "best.pt download failed (got HTML warning page instead of the model). "
-            "Try re-sharing the file or use a direct download link."
-        )
-
-    if os.path.getsize("best_model.pth") < 100_000:
-        os.remove("best_model.pth")
-        raise RuntimeError(
-            "best_model.pth download failed (got HTML warning page instead of the model)."
-        )
+    unet_path = hf_hub_download(repo_id=HF_REPO_ID, filename="best_model.pth")
+    yolo_path = hf_hub_download(repo_id=HF_REPO_ID, filename="best.pt")
 
     unet_model = smp.Unet(
         encoder_name="efficientnet-b0",
@@ -52,10 +34,10 @@ def load_models():
         in_channels=3,
         classes=1
     )
-    unet_model.load_state_dict(torch.load("best_model.pth", map_location=DEVICE))
+    unet_model.load_state_dict(torch.load(unet_path, map_location=DEVICE))
     unet_model.eval()
 
-    yolo_model = YOLO("best.pt")
+    yolo_model = YOLO(yolo_path)
 
     return unet_model, yolo_model
 
