@@ -5,3 +5,4 @@ ultralytics
 albumentations
 opencv-python-headless
 streamlit
+gdown
