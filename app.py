@@ -28,10 +28,25 @@ YOLO_FILE_ID = "1cCEj-Fg0w7-gWfonFITRxs4AsyNWcdWh"
 def load_models():
 
     if not os.path.exists("best_model.pth"):
-        gdown.download(id=UNET_FILE_ID, output="best_model.pth", quiet=False)
+        gdown.download(id=UNET_FILE_ID, output="best_model.pth", quiet=False, fuzzy=True)
 
     if not os.path.exists("best.pt"):
-        gdown.download(id=YOLO_FILE_ID, output="best.pt", quiet=False)
+        gdown.download(id=YOLO_FILE_ID, output="best.pt", quiet=False, fuzzy=True)
+
+    # Sanity check: a real model file should be at least a few hundred KB.
+    # If it's tiny, gdown likely downloaded Google's HTML warning page instead.
+    if os.path.getsize("best.pt") < 100_000:
+        os.remove("best.pt")
+        raise RuntimeError(
+            "best.pt download failed (got HTML warning page instead of the model). "
+            "Try re-sharing the file or use a direct download link."
+        )
+
+    if os.path.getsize("best_model.pth") < 100_000:
+        os.remove("best_model.pth")
+        raise RuntimeError(
+            "best_model.pth download failed (got HTML warning page instead of the model)."
+        )
 
     unet_model = smp.Unet(
         encoder_name="efficientnet-b0",
