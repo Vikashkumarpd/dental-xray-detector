@@ -28,13 +28,11 @@ YOLO_FILE_ID = "1cCEj-Fg0w7-gWfonFITRxs4AsyNWcdWh"
 def load_models():
 
     if not os.path.exists("best_model.pth"):
-        gdown.download(id=UNET_FILE_ID, output="best_model.pth", quiet=False, fuzzy=True)
+        gdown.download(id=UNET_FILE_ID, output="best_model.pth", quiet=False)
 
     if not os.path.exists("best.pt"):
-        gdown.download(id=YOLO_FILE_ID, output="best.pt", quiet=False, fuzzy=True)
+        gdown.download(id=YOLO_FILE_ID, output="best.pt", quiet=False)
 
-    # Sanity check: a real model file should be at least a few hundred KB.
-    # If it's tiny, gdown likely downloaded Google's HTML warning page instead.
     if os.path.getsize("best.pt") < 100_000:
         os.remove("best.pt")
         raise RuntimeError(
